@@ -20,6 +20,8 @@
     <p>Press S to save<p>
     <p><strong>Double click to view the pendulum in a new tab</strong></p>
     </strong>
+    <h2>Please scroll down a bit and enable RK4 then click "update parameters"</h2>
+    <h2>Also, switching tabs may cause the simulation to show random stuff with DeltaTime</h2>
     
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
     <script src="sketch.js"></script>
@@ -40,7 +42,7 @@
     <p class="subtle">If false, it will use the simpler and faster but less accurate Euler simulation.</p>
     <p class="subtle">RK4 is way slower than Eulerian, but it is more accurate.There are minor differences between the outputs, especially in the top-right and bottom-left corners.</p>
     <p class="subtle">DeltaTime may make RK4 less accurate than Eulerian if enabled.</p>
-    <p class="subtle"><strong>It's recommended to try both.</strong></p>
+    <p class="subtle"><strong>It's recommended to try RK4 first.</strong></p>
 
     <p>Color channel types (red, green, blue, alpha): <input type="text" id="ctype" placeholder="avg,avg,avg,full"></input></p>
     <p class="subtle">Use to modify the plot variables</p>
