@@ -13,9 +13,11 @@
  * @param {number} dt
  * @returns {object} 
  */
+const canvasSize = 600
+const damp = 0.99
 function stepDoublePendulum(state, dt) {
   const { a1, a2, a1_v, a2_v, l1, l2, m1, m2, g } = state
-
+  //loads of code that I will 
   let num1 = -g * (2 * m1 + m2) * Math.sin(a1)
   let num2 = -m2 * g * Math.sin(a1 - 2 * a2)
   let num3 = -2 * Math.sin(a1 - a2) * m2
@@ -29,11 +31,15 @@ function stepDoublePendulum(state, dt) {
   num4 = a2_v * a2_v * l2 * m2 * Math.cos(a1 - a2)
   den = l2 * (2 * m1 + m2 - m2 * Math.cos(2 * a1 - 2 * a2))
   const a2_a = (num1 * (num2 + num3 + num4)) / den
+  
 
-  const new_a1_v = a1_v + a1_a * dt
-  const new_a2_v = a2_v + a2_a * dt
+  var new_a1_v = a1_v + a1_a * dt
+  var new_a2_v = a2_v + a2_a * dt
   const new_a1 = a1 + new_a1_v * dt
   const new_a2 = a2 + new_a2_v * dt
+
+  new_a2_v *= damp 
+  new_a1_v *= damp
   return {
     ...state,
     a1: new_a1,
@@ -42,30 +48,38 @@ function stepDoublePendulum(state, dt) {
     a2_v: new_a2_v,
   }
 }
+
+/////////////////////////////////////////////
+
+
 var penduli = [] // pendulums
 var divergences = []
+var a1divergences = []
+var a2divergences = []
 function setup() {
-  createCanvas(400, 400)
+  createCanvas(canvasSize, canvasSize)
   var colorPlot = createImage(width, height)
   colorPlot.loadPixels();
 
-  for (let i = 0; i < 401; i++) {
+  for (let i = 0; i < canvasSize + 1; i++) {
     penduli.push([])
   }
   divergences = structuredClone(penduli)
   for (let i = 0; i < divergences.length; i++) {
     let e = divergences[i];
-    for (let j = 0; j < 401; j++) {
+    for (let j = 0; j < canvasSize + 1; j++) {
       e.push(0)
     }
     
   }
+  a1divergences = structuredClone(divergences)
+  a2divergences = structuredClone(divergences)
   //load the pendulums with different initial conditions
   //thetas(a1,a2) from -pi to pi
-  for (let i = 0; i < 401; i++) {
-    for (let j = 0; j < 401; j++) {
-      let a1 = map(i, 0, 400, -Math.PI, Math.PI)
-      let a2 = map(j, 0, 400, -Math.PI, Math.PI)
+  for (let i = 0; i < canvasSize + 1; i++) {
+    for (let j = 0; j < canvasSize + 1; j++) {
+      let a1 = map(i, 0, canvasSize, -Math.PI, Math.PI)
+      let a2 = map(j, 0, canvasSize, -Math.PI, Math.PI)
       let p = {
         a1: a1,
         a2: a2,
@@ -100,11 +114,33 @@ function draw() {
       divergences[x][y] = divergence
     }
   }
+
+
+  for (let x = 0; x < penduli.length - 1; x++) {
+    for (let y = 0; y < penduli[x].length - 1; y++) {
+      let p = penduli[x][y]
+      let pNext = penduli[x + 1][y] || penduli[x][y + 1] //edge case
+      let divergence = Math.abs(p.a1 - pNext.a1) 
+      a1divergences[x][y] = divergence
+    }
+  }
+
+
+  for (let x = 0; x < penduli.length - 1; x++) {
+    for (let y = 0; y < penduli[x].length - 1; y++) {
+      let p = penduli[x][y]
+      let pNext = penduli[x][y +1] || penduli[x+1][y] //edge case
+      let divergence = Math.abs(p.a2 - pNext.a2)
+      a2divergences[x][y] = divergence
+    }
+  }
   //now plot the divergences
   for (let x = 0; x < divergences.length; x++) {
     for (let y = 0; y < divergences[x].length; y++) {
       let divergence = divergences[x][y]
       let bright = map(divergence, 0, 1, 0, 255)
+      let a1div = map(a1divergences[x][y], 0, 1, 0, 255)
+      let a2div = map(a2divergences[x][y], 0, 1, 255, 0)
       let index = (x + y * width) * 4
       pixels[index] = bright
       pixels[index + 1] = bright
@@ -117,9 +153,10 @@ function draw() {
   for (let x = 0; x < penduli.length; x++) {
     for (let y = 0; y < penduli[x].length; y++) {
       let p = penduli[x][y]
-      penduli[x][y] = stepDoublePendulum(p, deltaTime/100)
+      penduli[x][y] = stepDoublePendulum(p, 1)
     }
   }
+  console.log(deltaTime)
   
 }
 
