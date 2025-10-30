@@ -1,20 +1,37 @@
-/**
- * @param {object} state 
- * @param {number} state.a1 angle
- * @param {number} state.a2 
- * @param {number} state.a1_v angle velocity
- * @param {number} state.a2_v
- * @param {number} state.l1
- * @param {number} state.l2
- * @param {number} state.m1
- * @param {number} state.m2
- * @param {number} state.g  
- * @param {any} [state....]
- * @param {number} dt
- * @returns {object} 
- */
-const canvasSize = 600
-const damp = 0.99
+const urlParams = new URLSearchParams(window.location.search);
+const canvasSize = parseInt(urlParams.get('canvasSize')) || 600;
+const damp = parseFloat(urlParams.get('damp')) || 0.99;
+const typeParam = urlParams.get('type');
+const type = typeParam ? typeParam.split(',') : ["avg","avg","avg","full"];
+function getChannelValue(avg, a1, a2) {
+  let channels=[]
+  for (let i = 0; i < type.length; i++) {
+    const e = type[i];
+    if (e == "avg") {
+    channels.push(avg)
+  } else if (e == "zero") {
+    channels.push(0)
+  } else if (e == "full") {
+    channels.push(255)
+  } else if (e == "max") {
+    channels.push(Math.max(a1, a2))
+  } else if (e == "min") {
+    channels.push(Math.min(a1, a2))
+  } else if (e == "a1") {
+    channels.push(a1)
+  } else if (e == "a2") {
+    channels.push(a2)
+  } else {
+    try {
+      channels.push(parseInt(e))
+    } catch (error) {
+      channels.push(avg)
+    }
+    
+  }
+  }
+  return channels
+}
 function stepDoublePendulum(state, dt) {
   const { a1, a2, a1_v, a2_v, l1, l2, m1, m2, g } = state
   //loads of code that I will 
@@ -142,10 +159,12 @@ function draw() {
       let a1div = map(a1divergences[x][y], 0, 1, 0, 255)
       let a2div = map(a2divergences[x][y], 0, 1, 255, 0)
       let index = (x + y * width) * 4
-      pixels[index] = bright
-      pixels[index + 1] = bright
-      pixels[index + 2] = bright
-      pixels[index + 3] = 255
+      let chv = getChannelValue(bright, a1div, a2div)
+      pixels[index] = chv[0]
+      pixels[index + 1] = chv[1]
+      pixels[index + 2] = chv[2]
+      pixels[index + 3] = chv[3]
+      
     }
   }
   updatePixels();
