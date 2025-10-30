@@ -1,6 +1,32 @@
 html, body {
   margin: 0;
   padding: 0;
+  font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+}
+p.subtle {
+  color: #808080;
+  font-size: 0.9em;
+  font-style:italic;
+}
+input{
+  background-color: #252526;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  padding: 4px;
+  font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
+  font-size: 1em;
+}
+
+button{
+  background-color: #303036;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  padding: 4px;
+  margin: 4px 0;
+  font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
+  font-size: 1em;
 }
 
 canvas {

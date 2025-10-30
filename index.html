@@ -13,7 +13,93 @@
   </head>
 
   <body>
-    <p>Double pendulum plot!</p>
+    <h1>Double pendulum plot!</h1>
+    <strong><p>Scroll down fully to view the simulation</p>
+    <p>You may have to wait a bit for the pendulums to diverge before the lines start appearing</p>
+    <p>Open DevTools (f12) to view time taken for each frame (miliseconds). Each frame will print one line.</p>
+    <p>Press S to save<p></strong>
+
+    <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
     <script src="sketch.js"></script>
+    <p>Parameters:</p>
+    <p>Canvas size in pixels: <input type="text" id="csize" placeholder="600"></input></p>
+    <p class="subtle">Reduce to make plot faster. If you enabled deltaTime, reducing this will make it more accurate (for the plotted values)</p>
+    <p>Damping factor:<input type="text" id="damp" placeholder="1"></input></p>
+    <p class="subtle">0 to 1, example: 0.999. The velocities get multiplied by this every tick</p>
+    <p>DeltaTime enabled? <input type="text" id="deltaTime" placeholder="no"></input></p>
+    <p class="subtle">If true, the simulation will use deltatime. This may make the viewing experience better, but it also may make it less accurate for laggier PCs.</p>
+    <p>Time step: <input type="text" id="timeStep" placeholder="1"></input></p>
+    <p class="subtle">The time step. If deltaTime is enabled it will be multiplied by deltatime.</p>
+    <p>Use RK4: <input type="text" id="rk4" placeholder="false"></input></p>
+    <p class="subtle">If true, this will use a more accurate 4th order Runge Kutta simulation (RK4).</p>
+    <p class="subtle">If false, it will use the simpler and faster but less accurate Euler simulation.</p>
+    <p class="subtle">RK4 is way slower than Eulerian, but it is more accurate.There are minor differences between the outputs, especially in the top-right and bottom-left corners.</p>
+    <p class="subtle">DeltaTime may make RK4 less accurate than Eulerian if enabled.</p>
+    <p class="subtle"><strong>It's recommended to try both.</strong></p>
+
+    <p>Color channel types (red, green, blue, alpha): <input type="text" id="ctype" placeholder="avg,avg,avg,full"></input></p>
+    <p class="subtle">Use to modify the plot variables</p>
+    <p class="subtle">Color channel types can be specified to generate custom plots</p>
+    <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button><button onclick="updateParameters()">Update Parameters</button>
+    <h2>Color channel string info</h2>
+    <p>The color channel types string should be in the format: <code>[red],[green],[blue],[alpha]</code></p>
+    <p>where <code>[red],[green],[blue],[alpha]</code> are in:</p>
+    <ul>
+      <li><code>avg</code>: Average of top angle divergence and bottom angle divergence</li>
+      <li><code>a1</code>: Top angle divergence</li>
+      <li><code>a2</code>: Bottom angle divergence</li>
+      <li><code>max</code>: Maximum of top angle divergence and bottom angle divergence</li>
+      <li><code>min</code>: Minimum of top angle divergence and bottom angle divergence</li>
+      <li><code>zero</code>: Channel value set to 0</li>
+      <li><code>full</code>: Channel value set to 255</li>
+      <li><code>[number]</code>: Any constant integer value between 0 and 255</li>
+    </ul>
+    <button onclick="updateParameters()">Update Parameters</button> <br>
+    <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
+    <br>
+    <br>
+    <p>You may have to wait a bit for the pendulums to diverge before the lines start appearing</p>
+    Press S to save<br>
+    Open DevTools (f12) to view time taken for each frame (miliseconds). Each frame will print one line.<br>
+    <p><strong>Plot</strong></p>
+    <script>
+      let csize_in = document.getElementById("csize");
+      let damp_in = document.getElementById("damp");
+      let ctype_in = document.getElementById("ctype");
+      let deltaTime_in = document.getElementById("deltaTime");
+      let timeStep_in = document.getElementById("timeStep");
+      let rk4_in = document.getElementById("rk4");
+      rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "";
+      deltaTime_in.value = new URL(window.location.href).searchParams.get('deltaTime')
+      timeStep_in.value = new URL(window.location.href).searchParams.get('timeStep') || "1";
+      csize_in.value = new URL(window.location.href).searchParams.get('canvasSize') || "600";
+      damp_in.value = new URL(window.location.href).searchParams.get('damp') || "0.999";
+      ctype_in.value = new URL(window.location.href).searchParams.get('type') || "avg,avg,avg,full";
+      function updateParameters() {
+        const csize = document.getElementById("csize").value;
+        const damp = document.getElementById("damp").value;
+        const ctype = document.getElementById("ctype").value;
+        const deltaTime = document.getElementById("deltaTime").value;
+        const timeStep = document.getElementById("timeStep").value;
+        const rk4 = document.getElementById("rk4").value;
+
+        var url = new URL(window.location.href);
+        url.searchParams.set('canvasSize', csize);
+        url.searchParams.set('damp', damp);
+        url.searchParams.set('type', ctype);
+        if (deltaTime.toLowerCase() === "yes" || deltaTime.toLowerCase() === "true") {
+          url.searchParams.set('deltaTime', 'true');
+        } //else set it to nothing
+        if (rk4.toLowerCase() === "yes" || rk4.toLowerCase() === "true") {
+          url.searchParams.set('rk4', 'true');
+        } 
+        if (timeStep !== "") {
+          url.searchParams.set('timeStep', timeStep);}
+        //redirect!
+        window.location.href = url.href;
+      }
+      
+    </script>
+
   </body>
 </html>
