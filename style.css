@@ -28,6 +28,15 @@ button{
   font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
   font-size: 1em;
 }
+a{
+  color: #4fc3f7;
+}
+a:visited {
+  color: #81c784;
+}
+a:hover {
+  color: #ffb74d;
+}
 
 canvas {
   display: block;

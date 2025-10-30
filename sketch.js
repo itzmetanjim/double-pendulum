@@ -197,7 +197,7 @@ function setup() {
         l2: 100,
         m1: 10,
         m2: 10,
-        g: 1,
+        g: 10,
       }
       penduli[i].push(p)
     }
@@ -274,4 +274,20 @@ function keyPressed() {
   if (key === 's') {
     save();
   }
+}
+function doubleClicked() {
+  const x = Math.floor(mouseX);
+  const y = Math.floor(mouseY);
+  if (x >= 0 && x < penduli.length && y >= 0 && y < penduli[0].length) {
+    const p = penduli[x][y];
+    const params = new URLSearchParams({
+      a1: p.a1,
+      a2: p.a2,
+      damp: damp,
+      timeStep: timeStep,
+      rk4: useRK4
+    });
+    window.open(`pendulum.html?${params.toString()}`, '_blank');
+  }
+  return false;
 }

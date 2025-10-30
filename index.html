@@ -17,7 +17,9 @@
     <strong><p>Scroll down fully to view the simulation</p>
     <p>You may have to wait a bit for the pendulums to diverge before the lines start appearing</p>
     <p>Open DevTools (f12) to view time taken for each frame (miliseconds). Each frame will print one line.</p>
-    <p>Press S to save<p></strong>
+    <p>Press S to save<p>
+    <p><strong>Double click to view the pendulum in a new tab</strong></p>
+    </strong>
 
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
     <script src="sketch.js"></script>
@@ -41,6 +43,11 @@
     <p class="subtle">Use to modify the plot variables</p>
     <p class="subtle">Color channel types can be specified to generate custom plots</p>
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button><button onclick="updateParameters()">Update Parameters</button>
+    <p>After (a lot of) some time, the result should approach something like this:</p>
+    <a href="example.png" target="_blank">Click here for image</a>
+    <p>You will see that most stable pendulums are in this big region near the center as well as smaller "islands of stability" near it that are disjoint from the main one</p>
+    <p>For a video explaining what this is (along with more interesting stuff and more graphs), check this out:</p>
+    <a href="https://www.youtube.com/watch?v=dtjb2OhEQcU">Video link</a>
     <h2>Color channel string info</h2>
     <p>The color channel types string should be in the format: <code>[red],[green],[blue],[alpha]</code></p>
     <p>where <code>[red],[green],[blue],[alpha]</code> are in:</p>
@@ -60,6 +67,7 @@
     <br>
     <p>You may have to wait a bit for the pendulums to diverge before the lines start appearing</p>
     Press S to save<br>
+    <strong>Double click to view the pendulum in a new tab</strong><br>
     Open DevTools (f12) to view time taken for each frame (miliseconds). Each frame will print one line.<br>
     <p><strong>Plot</strong></p>
     <script>
