@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Pendulum</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="libraries/p5.min.js"></script>
+  </head>
+  <body>
+    <p class="subtitle" id="info"></p>
+    <script src="pendulum.js"></script>
+    <script>
+        //display info about this pendulum
+        //example url /pendulum.html?a1=6.939048505703661&a2=7.751962594328812&damp=0.999&timeStep=1&rk4=true
+        function gp(name) {
+            const urlParams = new URLSearchParams(window.location.search)
+            return urlParams.get(name)
+        }
+        let infoText = `angles : ${gp('a1') || 'N/A'}, ${gp('a2') || 'N/A'} radian,  damp: ${gp('damp') || 'N/A'},  timeStep: ${gp('timeStep') || 'N/A'},  rk4: ${gp('rk4') || 'false'}, angles degree = ${gp('a1') ? (parseFloat(gp('a1')) * 180 / Math.PI).toFixed(2) : 'N/A'}, ${gp('a2') ? (parseFloat(gp('a2')) * 180 / Math.PI).toFixed(2) : 'N/A'}`
+        document.getElementById('info').innerText = infoText
+    </script>
+  </body>
+</html>
