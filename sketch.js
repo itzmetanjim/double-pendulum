@@ -22,8 +22,11 @@ function getSteppingTime(deltaTime) {
     return timeStep
   }
 }
-function getChannelValue(avg, a1, a2) {
+function getChannelValue(avg, a1, a2,angle1=0,angle2=0) {
   let channels = []
+  if (type[0]=="hsv"){
+    
+  }
   for (let i = 0; i < type.length; i++) {
     const e = type[i];
     if (e == "avg") {
@@ -40,6 +43,10 @@ function getChannelValue(avg, a1, a2) {
       channels.push(a1)
     } else if (e == "a2") {
       channels.push(a2)
+    } else if (e == "angle1") {
+      channels.push(angle1 * 255 / (2*Math.PI))
+    } else if (e == "angle2") {
+      channels.push(angle2 * 255 / (2*Math.PI))
     } else {
       try {
         channels.push(parseInt(e))
@@ -257,7 +264,7 @@ function draw() {
       let a1div = map(a1divergences[x][y], 0, 1, 0, 255)
       let a2div = map(a2divergences[x][y], 0, 1, 255, 0)
       let index = (x + y * width) * 4
-      let chv = getChannelValue(bright, a1div, a2div)
+      let chv = getChannelValue(bright, a1div, a2div,penduli[x][y].a1,penduli[x][y].a2)
       pixels[index] = chv[0]
       pixels[index + 1] = chv[1]
       pixels[index + 2] = chv[2]
