@@ -88,6 +88,9 @@
       <li><code>full</code>: Channel value set to 255</li>
       <li><code>[number]</code>: Any constant integer value between 0 and 255</li>
     </ul>
+    <p>You can also specify the first element to be <code>hsv</code>. <br>
+      In that case the subsequent elements will be interpreted as hue(0-360),saturation(0-100) and value/brightness(0-100). The scaling will happen in the same way.</p>
+    
     <button onclick="updateParameters()">Update Parameters</button> <br>
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
     <br>

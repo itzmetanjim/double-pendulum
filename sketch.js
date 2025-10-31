@@ -25,7 +25,87 @@ function getSteppingTime(deltaTime) {
 function getChannelValue(avg, a1, a2,angle1=0,angle2=0) {
   let channels = []
   if (type[0]=="hsv"){
-    
+    //interpret type[1] as hue, type[2] as saturation, type[3] as value
+    let h = 0
+    let s = 0
+    let v = 0
+    for (let i = 0; i < 3; i++) {
+      const e = type[i+1];
+      if (e == "avg") {
+        if (i==0) h=avg
+        if (i==1) s=avg
+        if (i==2) v=avg
+      } else if (e == "zero") {
+        if (i==0) h=0
+        if (i==1) s=0
+        if (i==2) v=0
+      } else if (e == "full") {
+        if (i==0) h=360
+        if (i==1) s=100
+        if (i==2) v=100
+      } else if (e == "max") {
+        if (i==0) h=Math.max(a1, a2)
+        if (i==1) s=Math.max(a1, a2)
+        if (i==2) v=Math.max(a1, a2)
+      } else if (e == "min") {
+        if (i==0) h=Math.min(a1, a2)
+        if (i==1) s=Math.min(a1, a2)
+        if (i==2) v=Math.min(a1, a2)
+      } else if (e == "a1") {
+        if (i==0) h=a1
+        if (i==1) s=a1
+        if (i==2) v=a1
+      } else if (e == "a2") {
+        if (i==0) h=a2
+        if (i==1) s=a2
+        if (i==2) v=a2
+      } else if (e == "angle1") {
+        if (i==0) h=angle1 * 360 / (2*Math.PI)
+        if (i==1) s=angle1 * 100 / (2*Math.PI)
+        if (i==2) v=angle1 * 100 / (2*Math.PI)
+      } else if (e == "angle2") {
+        if (i==0) h=angle2 * 360 / (2*Math.PI)
+        if (i==1) s=angle2 * 100 / (2*Math.PI)
+        if (i==2) v=angle2 * 100 / (2*Math.PI)
+      } else {
+        try {
+          const val = parseInt(e)
+          if (i==0) h=val
+          if (i==1) s=val
+          if (i==2) v=val
+        } catch (error) {
+          if (i==0) h=avg
+          if (i==1) s=avg
+          if (i==2) v=avg
+        } 
+      }
+    }
+    //convert hsv to rgb
+    let c = (v / 100) * (s / 100);
+    let x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    let m = (v / 100) - c;
+    let r1, g1, b1;
+    if (0 <= h && h < 60) {
+      r1 = c; g1 = x; b1 = 0;
+    } else if (60 <= h && h < 120) {
+      r1 = x; g1 = c; b1 = 0;
+    } else if (120 <= h && h < 180) {
+      r1 = 0; g1 = c; b1 = x;
+    } else if (180 <= h && h < 240) {
+      r1 = 0; g1 = x; b1 = c;
+    } else if (240 <= h && h < 300) {
+      r1 = x; g1 = 0; b1 = c;
+    } else {
+      r1 = c; g1 = 0; b1 = x;
+    }
+    let r = Math.round((r1 + m) * 255);
+    let g = Math.round((g1 + m) * 255);
+    let b = Math.round((b1 + m) * 255);
+    channels.push(r)
+    channels.push(g)
+    channels.push(b)
+    channels.push(255)
+    return channels
   }
   for (let i = 0; i < type.length; i++) {
     const e = type[i];
