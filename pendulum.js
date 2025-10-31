@@ -9,6 +9,8 @@ const l1_param = parseFloat(urlParams.get('l1')) || 100;
 const l2_param = parseFloat(urlParams.get('l2')) || 100;
 const m1_param = parseFloat(urlParams.get('m1')) || 10;
 const m2_param = parseFloat(urlParams.get('m2')) || 10;
+const a1_v_param = parseFloat(urlParams.get('a1_v')) || 0;
+const a2_v_param = parseFloat(urlParams.get('a2_v')) || 0;
 if(!useRK4){
 function stepDoublePendulum(state, dt) {
   const { a1, a2, a1_v, a2_v, l1, l2, m1, m2, g } = state
@@ -103,8 +105,8 @@ function setup() {
   pendulum = {
     a1: a1,
     a2: a2,
-    a1_v: 0,
-    a2_v: 0,
+    a1_v: a1_v_param,
+    a2_v: a2_v_param,
     l1: l1_param,
     l2: l2_param,
     m1: m1_param,

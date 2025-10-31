@@ -58,6 +58,10 @@
     <p class="subtle">Mass of the top pendulum bob. Default: 10</p>
     <p>Mass 2 (m2): <input type="text" id="m2" placeholder="10"></input></p>
     <p class="subtle">Mass of the bottom pendulum bob. Default: 10</p>
+    <p>Initial Angular Velocity 1 (a1_v): <input type="text" id="a1_v" placeholder="0"></input></p>
+    <p class="subtle">Initial angular velocity of the top pendulum. Default: 0</p>
+    <p>Initial Angular Velocity 2 (a2_v): <input type="text" id="a2_v" placeholder="0"></input></p>
+    <p class="subtle">Initial angular velocity of the bottom pendulum. Default: 0</p>
 
     <p>Color channel types (red, green, blue, alpha): <input type="text" id="ctype" placeholder="avg,avg,avg,full"></input></p>
     <p class="subtle">Use to modify the plot variables</p>
@@ -103,6 +107,8 @@
       let l2_in = document.getElementById("l2");
       let m1_in = document.getElementById("m1");
       let m2_in = document.getElementById("m2");
+      let a1_v_in = document.getElementById("a1_v");
+      let a2_v_in = document.getElementById("a2_v");
       
       rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "";
       deltaTime_in.value = new URL(window.location.href).searchParams.get('deltaTime')
@@ -115,6 +121,8 @@
       l2_in.value = new URL(window.location.href).searchParams.get('l2') || "100";
       m1_in.value = new URL(window.location.href).searchParams.get('m1') || "10";
       m2_in.value = new URL(window.location.href).searchParams.get('m2') || "10";
+      a1_v_in.value = new URL(window.location.href).searchParams.get('a1_v') || "0";
+      a2_v_in.value = new URL(window.location.href).searchParams.get('a2_v') || "0";
       
       function updateParameters() {
         const csize = document.getElementById("csize").value;
@@ -128,6 +136,8 @@
         const l2 = document.getElementById("l2").value;
         const m1 = document.getElementById("m1").value;
         const m2 = document.getElementById("m2").value;
+        const a1_v = document.getElementById("a1_v").value;
+        const a2_v = document.getElementById("a2_v").value;
 
         var url = new URL(window.location.href);
         url.searchParams.set('canvasSize', csize);
@@ -156,6 +166,12 @@
         }
         if (m2 !== "") {
           url.searchParams.set('m2', m2);
+        }
+        if (a1_v !== "") {
+          url.searchParams.set('a1_v', a1_v);
+        }
+        if (a2_v !== "") {
+          url.searchParams.set('a2_v', a2_v);
         }
         //redirect!
         window.location.href = url.href;
