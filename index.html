@@ -10,6 +10,9 @@
 
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
   </head>
 
   <body>
@@ -44,10 +47,23 @@
     <p class="subtle">DeltaTime may make RK4 less accurate than Eulerian if enabled.</p>
     <p class="subtle"><strong>It's recommended to try RK4 first.</strong></p>
 
+    <h3>Physical Parameters:</h3>
+    <p>Gravity (g): <input type="text" id="g" placeholder="10"></input></p>
+    <p class="subtle">Gravitational acceleration. Default: 10</p>
+    <p>Length 1 (l1): <input type="text" id="l1" placeholder="100"></input></p>
+    <p class="subtle">Length of the top pendulum arm. Default: 100</p>
+    <p>Length 2 (l2): <input type="text" id="l2" placeholder="100"></input></p>
+    <p class="subtle">Length of the bottom pendulum arm. Default: 100</p>
+    <p>Mass 1 (m1): <input type="text" id="m1" placeholder="10"></input></p>
+    <p class="subtle">Mass of the top pendulum bob. Default: 10</p>
+    <p>Mass 2 (m2): <input type="text" id="m2" placeholder="10"></input></p>
+    <p class="subtle">Mass of the bottom pendulum bob. Default: 10</p>
+
     <p>Color channel types (red, green, blue, alpha): <input type="text" id="ctype" placeholder="avg,avg,avg,full"></input></p>
     <p class="subtle">Use to modify the plot variables</p>
     <p class="subtle">Color channel types can be specified to generate custom plots</p>
-    <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button><button onclick="updateParameters()">Update Parameters</button>
+    <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>&nbsp; 
+     <button onclick="updateParameters()">Update Parameters</button>
     <p>After (a lot of) some time, the result should approach something like this:</p>
     <a href="example.png" target="_blank">Click here for image</a>
     <p>You will see that most stable pendulums are in this big region near the center as well as smaller "islands of stability" near it that are disjoint from the main one</p>
@@ -82,12 +98,24 @@
       let deltaTime_in = document.getElementById("deltaTime");
       let timeStep_in = document.getElementById("timeStep");
       let rk4_in = document.getElementById("rk4");
+      let g_in = document.getElementById("g");
+      let l1_in = document.getElementById("l1");
+      let l2_in = document.getElementById("l2");
+      let m1_in = document.getElementById("m1");
+      let m2_in = document.getElementById("m2");
+      
       rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "";
       deltaTime_in.value = new URL(window.location.href).searchParams.get('deltaTime')
       timeStep_in.value = new URL(window.location.href).searchParams.get('timeStep') || "1";
       csize_in.value = new URL(window.location.href).searchParams.get('canvasSize') || "600";
       damp_in.value = new URL(window.location.href).searchParams.get('damp') || "0.999";
       ctype_in.value = new URL(window.location.href).searchParams.get('type') || "avg,avg,avg,full";
+      g_in.value = new URL(window.location.href).searchParams.get('g') || "10";
+      l1_in.value = new URL(window.location.href).searchParams.get('l1') || "100";
+      l2_in.value = new URL(window.location.href).searchParams.get('l2') || "100";
+      m1_in.value = new URL(window.location.href).searchParams.get('m1') || "10";
+      m2_in.value = new URL(window.location.href).searchParams.get('m2') || "10";
+      
       function updateParameters() {
         const csize = document.getElementById("csize").value;
         const damp = document.getElementById("damp").value;
@@ -95,6 +123,11 @@
         const deltaTime = document.getElementById("deltaTime").value;
         const timeStep = document.getElementById("timeStep").value;
         const rk4 = document.getElementById("rk4").value;
+        const g = document.getElementById("g").value;
+        const l1 = document.getElementById("l1").value;
+        const l2 = document.getElementById("l2").value;
+        const m1 = document.getElementById("m1").value;
+        const m2 = document.getElementById("m2").value;
 
         var url = new URL(window.location.href);
         url.searchParams.set('canvasSize', csize);
@@ -107,7 +140,23 @@
           url.searchParams.set('rk4', 'true');
         } 
         if (timeStep !== "") {
-          url.searchParams.set('timeStep', timeStep);}
+          url.searchParams.set('timeStep', timeStep);
+        }
+        if (g !== "") {
+          url.searchParams.set('g', g);
+        }
+        if (l1 !== "") {
+          url.searchParams.set('l1', l1);
+        }
+        if (l2 !== "") {
+          url.searchParams.set('l2', l2);
+        }
+        if (m1 !== "") {
+          url.searchParams.set('m1', m1);
+        }
+        if (m2 !== "") {
+          url.searchParams.set('m2', m2);
+        }
         //redirect!
         window.location.href = url.href;
       }

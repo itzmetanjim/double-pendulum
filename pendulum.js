@@ -4,6 +4,11 @@ const a2 = parseFloat(urlParams.get('a2')) || 0;
 const damp = parseFloat(urlParams.get('damp')) || 1;
 const timeStep = parseFloat(urlParams.get('timeStep')) || 1;
 const useRK4 = urlParams.get('rk4') === 'true';
+const g_param = parseFloat(urlParams.get('g')) || 9.8;
+const l1_param = parseFloat(urlParams.get('l1')) || 100;
+const l2_param = parseFloat(urlParams.get('l2')) || 100;
+const m1_param = parseFloat(urlParams.get('m1')) || 10;
+const m2_param = parseFloat(urlParams.get('m2')) || 10;
 if(!useRK4){
 function stepDoublePendulum(state, dt) {
   const { a1, a2, a1_v, a2_v, l1, l2, m1, m2, g } = state
@@ -100,11 +105,11 @@ function setup() {
     a2: a2,
     a1_v: 0,
     a2_v: 0,
-    l1: 100,
-    l2: 100,
-    m1: 10,
-    m2: 10,
-    g: 9.8,
+    l1: l1_param,
+    l2: l2_param,
+    m1: m1_param,
+    m2: m2_param,
+    g: g_param,
   };
 }
 function draw() {

@@ -6,8 +6,13 @@ const type = typeParam ? typeParam.split(',') : ["avg", "avg", "avg", "full"];
 const useDeltaTime = urlParams.get('deltaTime') === 'false';
 const timeStep = urlParams.get('timeStep') ? parseFloat(urlParams.get('timeStep')) : 1;
 const useRK4 = !!(urlParams.get('rk4') === 'true');
+const g_param = parseFloat(urlParams.get('g')) || 10;
+const l1_param = parseFloat(urlParams.get('l1')) || 100;
+const l2_param = parseFloat(urlParams.get('l2')) || 100;
+const m1_param = parseFloat(urlParams.get('m1')) || 10;
+const m2_param = parseFloat(urlParams.get('m2')) || 10;
 console.log(urlParams)
-console.log("in order: canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4\n",canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4)
+console.log("in order: canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g,l1,l2,m1,m2\n",canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g_param,l1_param,l2_param,m1_param,m2_param)
 function getSteppingTime(deltaTime) {
   if (useDeltaTime) {
     return timeStep * deltaTime
@@ -193,11 +198,11 @@ function setup() {
         a2: a2,
         a1_v: 0,
         a2_v: 0,
-        l1: 100,
-        l2: 100,
-        m1: 10,
-        m2: 10,
-        g: 10,
+        l1: l1_param,
+        l2: l2_param,
+        m1: m1_param,
+        m2: m2_param,
+        g: g_param,
       }
       penduli[i].push(p)
     }
@@ -285,7 +290,12 @@ function doubleClicked() {
       a2: p.a2,
       damp: damp,
       timeStep: timeStep,
-      rk4: useRK4
+      rk4: useRK4,
+      g: g_param,
+      l1: l1_param,
+      l2: l2_param,
+      m1: m1_param,
+      m2: m2_param
     });
     window.open(`pendulum.html?${params.toString()}`, '_blank');
   }
