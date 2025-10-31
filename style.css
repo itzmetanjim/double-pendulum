@@ -28,6 +28,13 @@ button{
   font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
   font-size: 1em;
 }
+button:hover{
+  background-color: #45454a;
+  cursor: pointer;
+}
+button:active{
+  background-color: #2a2a2f;
+}
 a{
   color: #4fc3f7;
 }
