@@ -401,15 +401,20 @@ function doubleClicked() {
       damp: damp,
       timeStep: timeStep,
       rk4: useRK4,
-      g: g_param,
-      l1: l1_param,
-      l2: l2_param,
-      m1: m1_param,
-      m2: m2_param,
+      g: p.g,
+      l1: p.l1,
+      l2: p.l2,
+      m1: p.m1,
+      m2: p.m2,
       a1_v: p.a1_v,
       a2_v: p.a2_v
     });
     window.open(`pendulum.html?${params.toString()}`, '_blank');
   }
   return false;
+}
+function mousePressed(){
+  if (mouseButton === RIGHT){
+    save();
+  }
 }
