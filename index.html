@@ -63,6 +63,18 @@
     <p>Initial Angular Velocity 2 (a2_v): <input type="text" id="a2_v" placeholder="0"></input></p>
     <p class="subtle">Initial angular velocity of the bottom pendulum. Default: 0</p>
 
+    <h3>Parameter Space:</h3>
+    <p>Space Type: <input type="text" id="space" placeholder="angle"></input></p>
+    <p class="subtle">What parameter to vary across the plot. Options: angle, velocity, momentum, mass, length. Default: angle</p>
+    <p>Initial Angle 1 (for non-angle spaces): <input type="text" id="init_a1" placeholder="1.57"></input></p>
+    <p class="subtle">Initial angle for the top pendulum when not in angle-space. Default: π/2 (1.57)</p>
+    <p>Initial Angle 2 (for non-angle spaces): <input type="text" id="init_a2" placeholder="1.57"></input></p>
+    <p class="subtle">Initial angle for the bottom pendulum when not in angle-space. Default: π/2 (1.57)</p>
+    <p>Scale Min: <input type="text" id="scale_min" placeholder="-3.14159"></input></p>
+    <p class="subtle">Minimum value for the parameter space. Default: -π for angle, appropriate values for other spaces</p>
+    <p>Scale Max: <input type="text" id="scale_max" placeholder="3.14159"></input></p>
+    <p class="subtle">Maximum value for the parameter space. Default: π for angle, appropriate values for other spaces</p>
+
     <p>Color channel types (red, green, blue, alpha): <input type="text" id="ctype" placeholder="avg,avg,avg,full"></input></p>
     <p class="subtle">Use to modify the plot variables</p>
     <p class="subtle">Color channel types can be specified to generate custom plots</p>
@@ -90,7 +102,15 @@
     </ul>
     <p>You can also specify the first element to be <code>hsv</code>. <br>
       In that case the subsequent elements will be interpreted as hue(0-360),saturation(0-100) and value/brightness(0-100). The scaling will happen in the same way.</p>
-    
+    <h2>Parameter Space Info</h2>
+    <p>The <strong>Space Type</strong> parameter determines what varies across the plot:</p>
+    <ul>
+      <li><code>angle</code>: (Default) Horizontal = initial angle 1 (a1), Vertical = initial angle 2 (a2). Default scale: -π to π</li>
+      <li><code>velocity</code> or <code>momentum</code>: Horizontal = initial velocity 1 (a1_v), Vertical = initial velocity 2 (a2_v). Default scale: -10 to 10. Set initial angles with init_a1 and init_a2.</li>
+      <li><code>mass</code>: Horizontal = mass 1 (m1), Vertical = mass 2 (m2). Default scale: 1 to 100. Set initial angles with init_a1 and init_a2.</li>
+      <li><code>length</code>: Horizontal = length 1 (l1), Vertical = length 2 (l2). Default scale: 10 to 200. Set initial angles with init_a1 and init_a2.</li>
+    </ul>
+    <p>Use <strong>Scale Min</strong> and <strong>Scale Max</strong> to customize the range for any space type.</p>
     <button onclick="updateParameters()">Update Parameters</button> <br>
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
     <br>
@@ -114,6 +134,11 @@
       let m2_in = document.getElementById("m2");
       let a1_v_in = document.getElementById("a1_v");
       let a2_v_in = document.getElementById("a2_v");
+      let space_in = document.getElementById("space");
+      let init_a1_in = document.getElementById("init_a1");
+      let init_a2_in = document.getElementById("init_a2");
+      let scale_min_in = document.getElementById("scale_min");
+      let scale_max_in = document.getElementById("scale_max");
       
       rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "";
       deltaTime_in.value = new URL(window.location.href).searchParams.get('deltaTime')
@@ -128,6 +153,11 @@
       m2_in.value = new URL(window.location.href).searchParams.get('m2') || "10";
       a1_v_in.value = new URL(window.location.href).searchParams.get('a1_v') || "0";
       a2_v_in.value = new URL(window.location.href).searchParams.get('a2_v') || "0";
+      space_in.value = new URL(window.location.href).searchParams.get('space') || "angle";
+      init_a1_in.value = new URL(window.location.href).searchParams.get('init_a1') || "1.57";
+      init_a2_in.value = new URL(window.location.href).searchParams.get('init_a2') || "1.57";
+      scale_min_in.value = new URL(window.location.href).searchParams.get('scale_min') || "";
+      scale_max_in.value = new URL(window.location.href).searchParams.get('scale_max') || "";
       
       function updateParameters() {
         const csize = document.getElementById("csize").value;
@@ -143,6 +173,11 @@
         const m2 = document.getElementById("m2").value;
         const a1_v = document.getElementById("a1_v").value;
         const a2_v = document.getElementById("a2_v").value;
+        const space = document.getElementById("space").value;
+        const init_a1 = document.getElementById("init_a1").value;
+        const init_a2 = document.getElementById("init_a2").value;
+        const scale_min = document.getElementById("scale_min").value;
+        const scale_max = document.getElementById("scale_max").value;
 
         var url = new URL(window.location.href);
         url.searchParams.set('canvasSize', csize);
@@ -177,6 +212,21 @@
         }
         if (a2_v !== "") {
           url.searchParams.set('a2_v', a2_v);
+        }
+        if (space !== "") {
+          url.searchParams.set('space', space);
+        }
+        if (init_a1 !== "") {
+          url.searchParams.set('init_a1', init_a1);
+        }
+        if (init_a2 !== "") {
+          url.searchParams.set('init_a2', init_a2);
+        }
+        if (scale_min !== "") {
+          url.searchParams.set('scale_min', scale_min);
+        }
+        if (scale_max !== "") {
+          url.searchParams.set('scale_max', scale_max);
         }
         //redirect!
         window.location.href = url.href;

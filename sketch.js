@@ -13,8 +13,13 @@ const m1_param = parseFloat(urlParams.get('m1')) || 10;
 const m2_param = parseFloat(urlParams.get('m2')) || 10;
 const a1_v_param = parseFloat(urlParams.get('a1_v')) || 0;
 const a2_v_param = parseFloat(urlParams.get('a2_v')) || 0;
+const space_param = urlParams.get('space') || 'angle';
+const init_a1_param = parseFloat(urlParams.get('init_a1')) || Math.PI/2;
+const init_a2_param = parseFloat(urlParams.get('init_a2')) || Math.PI/2;
+const scale_min_param = urlParams.get('scale_min') ? parseFloat(urlParams.get('scale_min')) : null;
+const scale_max_param = urlParams.get('scale_max') ? parseFloat(urlParams.get('scale_max')) : null;
 console.log(urlParams)
-console.log("in order: canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g,l1,l2,m1,m2,a1_v,a2_v\n",canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g_param,l1_param,l2_param,m1_param,m2_param,a1_v_param,a2_v_param)
+console.log("in order: canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g,l1,l2,m1,m2,a1_v,a2_v,space,init_a1,init_a2,scale_min,scale_max\n",canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g_param,l1_param,l2_param,m1_param,m2_param,a1_v_param,a2_v_param,space_param,init_a1_param,init_a2_param,scale_min_param,scale_max_param)
 function getSteppingTime(deltaTime) {
   if (useDeltaTime) {
     return timeStep * deltaTime
@@ -258,6 +263,22 @@ var penduli = [] // pendulums
 var divergences = []
 var a1divergences = []
 var a2divergences = []
+function getScaleMin() {
+  if (scale_min_param !== null) return scale_min_param;
+  if (space_param === 'angle') return -Math.PI;
+  if (space_param === 'velocity' || space_param === 'momentum') return -10;
+  if (space_param === 'mass') return 1;
+  if (space_param === 'length') return 10;
+  return -Math.PI;
+}
+function getScaleMax() {
+  if (scale_max_param !== null) return scale_max_param;
+  if (space_param === 'angle') return Math.PI;
+  if (space_param === 'velocity' || space_param === 'momentum') return 10;
+  if (space_param === 'mass') return 100;
+  if (space_param === 'length') return 200;
+  return Math.PI;
+}
 function setup() {
   createCanvas(canvasSize, canvasSize)
   var colorPlot = createImage(width, height)
@@ -276,21 +297,21 @@ function setup() {
   }
   a1divergences = structuredClone(divergences)
   a2divergences = structuredClone(divergences)
-  //load the pendulums with different initial conditions
-  //thetas(a1,a2) from -pi to pi
+  const scaleMin = getScaleMin();
+  const scaleMax = getScaleMax();
   for (let i = 0; i < canvasSize + 1; i++) {
     for (let j = 0; j < canvasSize + 1; j++) {
-      let a1 = map(i, 0, canvasSize, -Math.PI, Math.PI)
-      let a2 = map(j, 0, canvasSize, -Math.PI, Math.PI)
+      let val1 = map(i, 0, canvasSize, scaleMin, scaleMax)
+      let val2 = map(j, 0, canvasSize, scaleMin, scaleMax)
       let p = {
-        a1: a1,
-        a2: a2,
-        a1_v: a1_v_param,
-        a2_v: a2_v_param,
-        l1: l1_param,
-        l2: l2_param,
-        m1: m1_param,
-        m2: m2_param,
+        a1: space_param === 'angle' ? val1 : init_a1_param,
+        a2: space_param === 'angle' ? val2 : init_a2_param,
+        a1_v: (space_param === 'velocity' || space_param === 'momentum') ? val1 : a1_v_param,
+        a2_v: (space_param === 'velocity' || space_param === 'momentum') ? val2 : a2_v_param,
+        l1: space_param === 'length' ? val1 : l1_param,
+        l2: space_param === 'length' ? val2 : l2_param,
+        m1: space_param === 'mass' ? val1 : m1_param,
+        m2: space_param === 'mass' ? val2 : m2_param,
         g: g_param,
       }
       penduli[i].push(p)
