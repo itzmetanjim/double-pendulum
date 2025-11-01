@@ -20,6 +20,9 @@ const scale_min_param = urlParams.get('scale_min') ? parseFloat(urlParams.get('s
 const scale_max_param = urlParams.get('scale_max') ? parseFloat(urlParams.get('scale_max')) : null;
 console.log(urlParams)
 console.log("in order: canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g,l1,l2,m1,m2,a1_v,a2_v,space,init_a1,init_a2,scale_min,scale_max\n",canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g_param,l1_param,l2_param,m1_param,m2_param,a1_v_param,a2_v_param,space_param,init_a1_param,init_a2_param,scale_min_param,scale_max_param)
+if(!useRK4){
+  alert("use rk4 because euler simulation is very inaccurate +does not work well")
+}
 function getSteppingTime(deltaTime) {
   if (useDeltaTime) {
     return timeStep * deltaTime
