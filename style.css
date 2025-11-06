@@ -28,7 +28,9 @@ button{
   font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
   font-size: 1em;
 }
-
+.small{
+  font-size: 0.8em;
+}
 .displaynone{
   display: none;
 }

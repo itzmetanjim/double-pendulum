@@ -385,7 +385,10 @@ function draw() {
     }
   }
   window.cfDeltaTime = deltaTime
+  
+
   console.log(deltaTime)
+  
 
 }
 
