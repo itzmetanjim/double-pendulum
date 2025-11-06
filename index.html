@@ -119,7 +119,12 @@
     Press S to save<br>
     <strong>Double click to view the pendulum in a new tab</strong><br>
     Open DevTools (f12) to view time taken for each frame (miliseconds). Each frame will print one line.<br>
+    <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button> <button onclick="document.getElementById('benchmark').classList.toggle('displaynone')">Toggle Benchmark</button>
+    <div id="benchmark" class="displaynone">
+      <div id="speedometer"></div>
+    </div>
     <p><strong>Plot</strong></p>
+    
     <script>
       let csize_in = document.getElementById("csize");
       let damp_in = document.getElementById("damp");

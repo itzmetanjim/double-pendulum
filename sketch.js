@@ -384,6 +384,7 @@ function draw() {
       penduli[x][y] = stepDoublePendulum(p, getSteppingTime(deltaTime))
     }
   }
+  window.cfDeltaTime = deltaTime
   console.log(deltaTime)
 
 }

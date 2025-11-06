@@ -28,6 +28,18 @@ button{
   font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
   font-size: 1em;
 }
+
+.displaynone{
+  display: none;
+}
+#benchmark{
+  max-height: 200px;
+  overflow-y: scroll;
+  background-color: #252526;
+  padding: 8px;
+  border: 1px solid #3c3c3c;
+  margin-top: 8px;
+}
 button:hover{
   background-color: #45454a;
   cursor: pointer;
