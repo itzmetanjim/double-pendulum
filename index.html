@@ -260,11 +260,11 @@
           animation: true,
           scales: {
             x: {
-              display: false
+                 display: false,
             },
             y: {
               beginAtZero: true,
-              max: 5,
+//              max: 5,
               grid: {
                 color: '#3c3c3c'
               },
@@ -286,11 +286,11 @@
         const currentFPS = window.cfDeltaTime ? 1000/window.cfDeltaTime : 0
         document.getElementById("fps").innerText = currentFPS.toFixed(1)
         fpsData.labels.push('')
-        fpsData.datasets[0].data.push(currentFPS)
+        fpsData.datasets[0].data.push(currentFPS)/*
         if (fpsData.labels.length > 60) {
           fpsData.labels.shift()
           fpsData.datasets[0].data.shift()
-        }
+        }*/
         fpsChart.update()
       }
       setInterval(updateFPS,100)
