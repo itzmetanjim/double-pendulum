@@ -10,6 +10,7 @@
 
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
@@ -120,9 +121,8 @@
     <strong>Double click to view the pendulum in a new tab</strong><br>
     Open DevTools (f12) to view time taken for each frame (miliseconds). Each frame will print one line.<br>
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button> <button onclick="document.getElementById('benchmark').classList.toggle('displaynone')">Toggle FPS graph</button>
-    <div id="benchmark" class="displaynone">
-      
-
+    <div id="benchmark">
+        <canvas id="fpsChart" width="400" height="200"></canvas>
     </div>
 
     <p><strong>Plot</strong></p>
@@ -238,8 +238,60 @@
         //redirect!
         window.location.href = url.href;
       }
+      const ctx = document.getElementById('fpsChart').getContext('2d');
+      const fpsData = {
+        labels: [],
+        datasets: [{
+          label: 'fps',
+          data: [],
+          borderColor: 'rgb(79, 195, 247)',
+          backgroundColor: 'rgba(79, 195, 247, 0.1)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 0
+        }]
+      };
+      const fpsChart = new Chart(ctx, {
+        type: 'line',
+        data: fpsData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: true,
+          scales: {
+            x: {
+              display: false
+            },
+            y: {
+              beginAtZero: true,
+              max: 5,
+              grid: {
+                color: '#3c3c3c'
+              },
+              ticks: {
+                color: '#d4d4d4'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: '#d4d4d4'
+              }
+            }
+          }
+        }
+      });
       function updateFPS(fps) {
-        document.getElementById("fps").innerText = window.cfDeltaTime ? 1000/window.cfDeltaTime : "...";
+        const currentFPS = window.cfDeltaTime ? 1000/window.cfDeltaTime : 0
+        document.getElementById("fps").innerText = currentFPS.toFixed(1)
+        fpsData.labels.push('')
+        fpsData.datasets[0].data.push(currentFPS)
+        if (fpsData.labels.length > 60) {
+          fpsData.labels.shift()
+          fpsData.datasets[0].data.shift()
+        }
+        fpsChart.update()
       }
       setInterval(updateFPS,100)
 
