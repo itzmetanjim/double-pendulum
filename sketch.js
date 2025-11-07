@@ -1,3 +1,5 @@
+new p5()
+
 const urlParams = new URLSearchParams(window.location.search);
 const canvasSize = parseInt(urlParams.get('canvasSize')) || 600;
 const damp = parseFloat(urlParams.get('damp')) || 1;
@@ -420,6 +422,7 @@ function doubleClicked() {
   }
   return false;
 }
+window.saveSketch = save
 function mousePressed(){
   if (mouseButton === RIGHT){
     save();

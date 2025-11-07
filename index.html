@@ -123,6 +123,8 @@
     <p>Use <strong>Scale Min</strong> and <strong>Scale Max</strong> to customize the range for any space type.</p>
     <button onclick="updateParameters()">Update Parameters</button> <br>
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
+    <p>Periodic save period, 0 or "disable" to disable. This does not reload the window. <input type="text" placeholder="seconds" id="savep"></input><button onclick="savePeriodUpdate()">Update save period</button></p>
+    <button onclick="window.saveSketch()">Save Now</button>
     <br>
     <br>
     <p>You may have to wait a bit for the pendulums to diverge before the lines start appearing</p>
@@ -156,6 +158,10 @@
       let scale_min_in = document.getElementById("scale_min");
       let scale_max_in = document.getElementById("scale_max");
       
+      window.saveSketch=save;
+      window.prevms=Date.now()
+      window.savePeriod=0
+
       rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "";
       deltaTime_in.value = new URL(window.location.href).searchParams.get('deltaTime')
       timeStep_in.value = new URL(window.location.href).searchParams.get('timeStep') || "1";
@@ -303,7 +309,27 @@
         fpsChart.update()
       }
       setInterval(updateFPS,100)
-
+      function savePeriodUpdate() {
+        const sp = document.getElementById("savep").value;
+        if (sp.toLowerCase() === "disable" || sp === "0" || sp === "") {
+          window.savePeriod = 0;
+        } else {
+          const spnum = parseFloat(sp);
+          if (!isNaN(spnum) && spnum > 0) {
+            window.savePeriod = spnum;
+          } else {
+            window.savePeriod=0;
+          }
+        }
+      }
+      function saveF(){
+        const nowms = Date.now();
+        if (window.savePeriod > 0 && nowms - window.prevms >= window.savePeriod * 1000) {
+          window.prevms = nowms;
+          window.saveSketch();
+        }
+      }
+      setInterval(saveF, 10);
     </script>
 
   </body>
