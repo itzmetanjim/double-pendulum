@@ -7,7 +7,7 @@ const typeParam = urlParams.get('type');
 const type = typeParam ? typeParam.split(',') : ["avg", "avg", "avg", "full"];
 const useDeltaTime = urlParams.get('deltaTime') === 'false';
 const timeStep = urlParams.get('timeStep') ? parseFloat(urlParams.get('timeStep')) : 1;
-const useRK4 = !!(urlParams.get('rk4') === 'true');
+const useRK4 = urlParams.get('rk4') === 'false' ? false : true;
 const g_param = parseFloat(urlParams.get('g')) || 10;
 const l1_param = parseFloat(urlParams.get('l1')) || 100;
 const l2_param = parseFloat(urlParams.get('l2')) || 100;

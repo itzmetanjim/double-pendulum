@@ -164,7 +164,7 @@
       window.prevms=Date.now()
       window.savePeriod=0
 
-      rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "";
+      rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "true";
       deltaTime_in.value = new URL(window.location.href).searchParams.get('deltaTime')
       timeStep_in.value = new URL(window.location.href).searchParams.get('timeStep') || "1";
       csize_in.value = new URL(window.location.href).searchParams.get('canvasSize') || "600";
