@@ -30,6 +30,7 @@
     <h2>Also, switching tabs may cause the simulation to show random stuff with DeltaTime</h2>
     
     <button onclick="window.scrollTo(0, document.body.scrollHeight);">Scroll to simulation</button>
+    <script src="simulation-core.js"></script>
     <script src="sketch.js"></script>
     <p>Source code:</p> 
     <a href="https://github.com/itzmetanjim/double-pendulum">https://github.com/itzmetanjim/double-pendulum</a>
@@ -58,6 +59,14 @@
     <p class="subtle">RK4 is way slower than Eulerian, but it is more accurate.There are minor differences between the outputs, especially in the top-right and bottom-left corners.</p>
     <p class="subtle">DeltaTime may make RK4 less accurate than Eulerian if enabled.</p>
     <p class="subtle"><strong>It's recommended to try RK4 first.</strong></p>
+    <p>Computation method:
+      <select id="compute">
+        <option value="normal">Normal (single thread)</option>
+        <option value="workers">Web Workers (multithreaded)</option>
+        <option value="webgl">WebGL (GPU render)</option>
+      </select>
+    </p>
+    <p class="subtle">Normal matches the current simulation. Workers split the grid across CPU cores. WebGL uses the GPU to render the frame.</p>
 
     <h3>Physical Parameters:</h3>
     <p>Gravity (g): <input type="text" id="g" placeholder="10"></input></p>
@@ -147,6 +156,7 @@
       let deltaTime_in = document.getElementById("deltaTime");
       let timeStep_in = document.getElementById("timeStep");
       let rk4_in = document.getElementById("rk4");
+      let compute_in = document.getElementById("compute");
       let g_in = document.getElementById("g");
       let l1_in = document.getElementById("l1");
       let l2_in = document.getElementById("l2");
@@ -165,6 +175,7 @@
       window.savePeriod=0
 
       rk4_in.value = new URL(window.location.href).searchParams.get('rk4') || "true";
+      compute_in.value = new URL(window.location.href).searchParams.get('compute') || "normal";
       deltaTime_in.value = new URL(window.location.href).searchParams.get('deltaTime')
       timeStep_in.value = new URL(window.location.href).searchParams.get('timeStep') || "1";
       csize_in.value = new URL(window.location.href).searchParams.get('canvasSize') || "600";
@@ -190,6 +201,7 @@
         const deltaTime = document.getElementById("deltaTime").value;
         const timeStep = document.getElementById("timeStep").value;
         const rk4 = document.getElementById("rk4").value;
+        const compute = document.getElementById("compute").value;
         const g = document.getElementById("g").value;
         const l1 = document.getElementById("l1").value;
         const l2 = document.getElementById("l2").value;
@@ -213,6 +225,9 @@
         if (rk4.toLowerCase() === "yes" || rk4.toLowerCase() === "true") {
           url.searchParams.set('rk4', 'true');
         } 
+        if (compute !== "") {
+          url.searchParams.set('compute', compute);
+        }
         if (timeStep !== "") {
           url.searchParams.set('timeStep', timeStep);
         }

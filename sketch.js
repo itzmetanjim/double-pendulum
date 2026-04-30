@@ -1,11 +1,11 @@
-new p5()
+new p5();
 
 const urlParams = new URLSearchParams(window.location.search);
-const canvasSize = parseInt(urlParams.get('canvasSize')) || 600;
+const canvasSize = parseInt(urlParams.get('canvasSize'), 10) || 600;
 const damp = parseFloat(urlParams.get('damp')) || 1;
 const typeParam = urlParams.get('type');
-const type = typeParam ? typeParam.split(',') : ["avg", "avg", "avg", "full"];
-const useDeltaTime = urlParams.get('deltaTime') === 'false';
+const type = typeParam ? typeParam.split(',') : ['avg', 'avg', 'avg', 'full'];
+const useDeltaTime = urlParams.get('deltaTime') === 'true';
 const timeStep = urlParams.get('timeStep') ? parseFloat(urlParams.get('timeStep')) : 1;
 const useRK4 = urlParams.get('rk4') === 'false' ? false : true;
 const g_param = parseFloat(urlParams.get('g')) || 10;
@@ -16,382 +16,379 @@ const m2_param = parseFloat(urlParams.get('m2')) || 10;
 const a1_v_param = parseFloat(urlParams.get('a1_v')) || 0;
 const a2_v_param = parseFloat(urlParams.get('a2_v')) || 0;
 const space_param = urlParams.get('space') || 'angle';
-const init_a1_param = parseFloat(urlParams.get('init_a1')) || Math.PI/2;
-const init_a2_param = parseFloat(urlParams.get('init_a2')) || Math.PI/2;
+const init_a1_param = parseFloat(urlParams.get('init_a1')) || Math.PI / 2;
+const init_a2_param = parseFloat(urlParams.get('init_a2')) || Math.PI / 2;
 const scale_min_param = urlParams.get('scale_min') ? parseFloat(urlParams.get('scale_min')) : null;
 const scale_max_param = urlParams.get('scale_max') ? parseFloat(urlParams.get('scale_max')) : null;
-console.log(urlParams)
-console.log("in order: canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g,l1,l2,m1,m2,a1_v,a2_v,space,init_a1,init_a2,scale_min,scale_max\n",canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g_param,l1_param,l2_param,m1_param,m2_param,a1_v_param,a2_v_param,space_param,init_a1_param,init_a2_param,scale_min_param,scale_max_param)
-if(!useRK4){
-  alert("use rk4 because euler simulation is very inaccurate +does not work well")
-}
-function getSteppingTime(deltaTime) {
-  if (useDeltaTime) {
-    return timeStep * deltaTime
-  } else {
-    return timeStep
-  }
-}
-function getChannelValue(avg, a1, a2,angle1=0,angle2=0) {
-  let channels = []
-  if (type[0]=="hsv"){
-    //interpret type[1] as hue, type[2] as saturation, type[3] as value
-    let h = 0
-    let s = 0
-    let v = 0
-    for (let i = 0; i < 3; i++) {
-      const e = type[i+1];
-      if (e == "avg") {
-        if (i==0) h=avg
-        if (i==1) s=avg
-        if (i==2) v=avg
-      } else if (e == "zero") {
-        if (i==0) h=0
-        if (i==1) s=0
-        if (i==2) v=0
-      } else if (e == "full") {
-        if (i==0) h=360
-        if (i==1) s=100
-        if (i==2) v=100
-      } else if (e == "max") {
-        if (i==0) h=Math.max(a1, a2)
-        if (i==1) s=Math.max(a1, a2)
-        if (i==2) v=Math.max(a1, a2)
-      } else if (e == "min") {
-        if (i==0) h=Math.min(a1, a2)
-        if (i==1) s=Math.min(a1, a2)
-        if (i==2) v=Math.min(a1, a2)
-      } else if (e == "a1") {
-        if (i==0) h=a1
-        if (i==1) s=a1
-        if (i==2) v=a1
-      } else if (e == "a2") {
-        if (i==0) h=a2
-        if (i==1) s=a2
-        if (i==2) v=a2
-      } else if (e == "angle1") {
-        if (i==0) h=angle1 * 360 / (2*Math.PI)
-        if (i==1) s=angle1 * 100 / (2*Math.PI)
-        if (i==2) v=angle1 * 100 / (2*Math.PI)
-      } else if (e == "angle2") {
-        if (i==0) h=angle2 * 360 / (2*Math.PI)
-        if (i==1) s=angle2 * 100 / (2*Math.PI)
-        if (i==2) v=angle2 * 100 / (2*Math.PI)
-      } else {
-        try {
-          const val = parseInt(e)
-          if (i==0) h=val
-          if (i==1) s=val
-          if (i==2) v=val
-        } catch (error) {
-          if (i==0) h=avg
-          if (i==1) s=avg
-          if (i==2) v=avg
-        } 
-      }
-    }
-    //convert hsv to rgb
-    let c = (v / 100) * (s / 100);
-    let x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-    let m = (v / 100) - c;
-    let r1, g1, b1;
-    if (0 <= h && h < 60) {
-      r1 = c; g1 = x; b1 = 0;
-    } else if (60 <= h && h < 120) {
-      r1 = x; g1 = c; b1 = 0;
-    } else if (120 <= h && h < 180) {
-      r1 = 0; g1 = c; b1 = x;
-    } else if (180 <= h && h < 240) {
-      r1 = 0; g1 = x; b1 = c;
-    } else if (240 <= h && h < 300) {
-      r1 = x; g1 = 0; b1 = c;
-    } else {
-      r1 = c; g1 = 0; b1 = x;
-    }
-    let r = Math.round((r1 + m) * 255);
-    let g = Math.round((g1 + m) * 255);
-    let b = Math.round((b1 + m) * 255);
-    channels.push(r)
-    channels.push(g)
-    channels.push(b)
-    channels.push(255)
-    return channels
-  }
-  for (let i = 0; i < type.length; i++) {
-    const e = type[i];
-    if (e == "avg") {
-      channels.push(avg)
-    } else if (e == "zero") {
-      channels.push(0)
-    } else if (e == "full") {
-      channels.push(255)
-    } else if (e == "max") {
-      channels.push(Math.max(a1, a2))
-    } else if (e == "min") {
-      channels.push(Math.min(a1, a2))
-    } else if (e == "a1") {
-      channels.push(a1)
-    } else if (e == "a2") {
-      channels.push(a2)
-    } else if (e == "angle1") {
-      channels.push(angle1 * 255 / (2*Math.PI))
-    } else if (e == "angle2") {
-      channels.push(angle2 * 255 / (2*Math.PI))
-    } else {
-      try {
-        channels.push(parseInt(e))
-      } catch (error) {
-        channels.push(avg)
-      }
+let computeMethod = urlParams.get('compute') || 'normal';
 
-    }
-  }
-  return channels
-}
-if(!useRK4){
-function stepDoublePendulum(state, dt) {
-  const { a1, a2, a1_v, a2_v, l1, l2, m1, m2, g } = state
-  let num1 = -g * (2 * m1 + m2) * Math.sin(a1)
-  let num2 = -m2 * g * Math.sin(a1 - 2 * a2)
-  let num3 = -2 * Math.sin(a1 - a2) * m2
-  let num4 = a2_v * a2_v * l2 + a1_v * a1_v * l1 * Math.cos(a1 - a2)
-  let den = l1 * (2 * m1 + m2 - m2 * Math.cos(2 * a1 - 2 * a2))
-  const a1_a = (num1 + num2 + num3 * num4) / den
+console.log(urlParams);
+console.log(
+  'in order: canvasSize,damp,typeParam,type,useDeltaTime,timeStep,useRK4,g,l1,l2,m1,m2,a1_v,a2_v,space,init_a1,init_a2,scale_min,scale_max,compute',
+  canvasSize,
+  damp,
+  typeParam,
+  type,
+  useDeltaTime,
+  timeStep,
+  useRK4,
+  g_param,
+  l1_param,
+  l2_param,
+  m1_param,
+  m2_param,
+  a1_v_param,
+  a2_v_param,
+  space_param,
+  init_a1_param,
+  init_a2_param,
+  scale_min_param,
+  scale_max_param,
+  computeMethod
+);
 
-  num1 = 2 * Math.sin(a1 - a2)
-  num2 = (a1_v * a1_v * l1 * (m1 + m2))
-  num3 = g * (m1 + m2) * Math.cos(a1)
-  num4 = a2_v * a2_v * l2 * m2 * Math.cos(a1 - a2)
-  den = l2 * (2 * m1 + m2 - m2 * Math.cos(2 * a1 - 2 * a2))
-  const a2_a = (num1 * (num2 + num3 + num4)) / den
-
-
-  var new_a1_v = a1_v + a1_a * dt
-  var new_a2_v = a2_v + a2_a * dt
-  const new_a1 = a1 + new_a1_v * dt
-  const new_a2 = a2 + new_a2_v * dt
-
-  new_a2_v *= damp
-  new_a1_v *= damp
-  return {
-    ...state,
-    a1: new_a1,
-    a2: new_a2,
-    a1_v: new_a1_v,
-    a2_v: new_a2_v,
-  }
-}
+if (!useRK4) {
+  alert('use rk4 because euler simulation is very inaccurate +does not work well');
 }
 
-if(useRK4){
-const getDerivatives = (s) => {
-    // The state s has the same structure: { a1, a2, a1_v, a2_v, ... }
-    const { a1, a2, a1_v, a2_v, l1, l2, m1, m2, g } = s;
+let backend = null;
+let localContext = null;
+let localImageData = null;
+let localPixels = null;
+let localSimulator = null;
+let webglCanvas = null;
+let webglRenderer = null;
+let workerStateRequest = null;
 
-    // The derivative of an angle is its angular velocity.
-    const da1 = a1_v;
-    const da2 = a2_v;
-
-    // The derivative of an angular velocity is its angular acceleration.
-    // This is the same physics calculation as in your original function.
-    let num1 = -g * (2 * m1 + m2) * Math.sin(a1);
-    let num2 = -m2 * g * Math.sin(a1 - 2 * a2);
-    let num3 = -2 * Math.sin(a1 - a2) * m2;
-    let num4 = a2_v * a2_v * l2 + a1_v * a1_v * l1 * Math.cos(a1 - a2);
-    let den = l1 * (2 * m1 + m2 - m2 * Math.cos(2 * a1 - 2 * a2));
-    const da1_v = (num1 + num2 + num3 * num4) / den; // This is a1_a
-
-    num1 = 2 * Math.sin(a1 - a2);
-    num2 = (a1_v * a1_v * l1 * (m1 + m2));
-    num3 = g * (m1 + m2) * Math.cos(a1);
-    num4 = a2_v * a2_v * l2 * m2 * Math.cos(a1 - a2);
-    den = l2 * (2 * m1 + m2 - m2 * Math.cos(2 * a1 - 2 * a2));
-    const da2_v = (num1 * (num2 + num3 + num4)) / den; // This is a2_a
-
-    return { da1, da2, da1_v, da2_v };
-  };
-function stepDoublePendulum(state, dt) {
-
-
-  // staring point
-  const k1 = getDerivatives(state);
-
-  // maybe middle point
-  const state2 = { ...state,
-    a1: state.a1 + k1.da1 * dt / 2,
-    a2: state.a2 + k1.da2 * dt / 2,
-    a1_v: state.a1_v + k1.da1_v * dt / 2,
-    a2_v: state.a2_v + k1.da2_v * dt / 2,
-  };
-  const k2 = getDerivatives(state2);
-
-  //also middle point but better ig
-  const state3 = { ...state,
-    a1: state.a1 + k2.da1 * dt / 2,
-    a2: state.a2 + k2.da2 * dt / 2,
-    a1_v: state.a1_v + k2.da1_v * dt / 2,
-    a2_v: state.a2_v + k2.da2_v * dt / 2,
-  };
-  const k3 = getDerivatives(state3);
-
-  // endpoint
-  const state4 = { ...state,
-    a1: state.a1 + k3.da1 * dt,
-    a2: state.a2 + k3.da2 * dt,
-    a1_v: state.a1_v + k3.da1_v * dt,
-    a2_v: state.a2_v + k3.da2_v * dt,
-  };
-  const k4 = getDerivatives(state4);
-
-  //avg them
-  const final_a1 = state.a1 + (dt / 6) * (k1.da1 + 2 * k2.da1 + 2 * k3.da1 + k4.da1);
-  const final_a2 = state.a2 + (dt / 6) * (k1.da2 + 2 * k2.da2 + 2 * k3.da2 + k4.da2);
-  let final_a1_v = state.a1_v + (dt / 6) * (k1.da1_v + 2 * k2.da1_v + 2 * k3.da1_v + k4.da1_v);
-  let final_a2_v = state.a2_v + (dt / 6) * (k1.da2_v + 2 * k2.da2_v + 2 * k3.da2_v + k4.da2_v);
-  //damp
-  final_a1_v *= damp;
-  final_a2_v *= damp;
-  return {
-    ...state,
-    a1: final_a1,
-    a2: final_a2,
-    a1_v: final_a1_v,
-    a2_v: final_a2_v,
-  };
-}
-}
-
-/////////////////////////////////////////////
-
-
-var penduli = [] // pendulums
-var divergences = []
-var a1divergences = []
-var a2divergences = []
-function getScaleMin() {
-  if (scale_min_param !== null) return scale_min_param;
-  if (space_param === 'angle') return -Math.PI;
-  if (space_param === 'velocity' || space_param === 'momentum') return -10;
-  if (space_param === 'mass') return 1;
-  if (space_param === 'length') return 10;
-  return -Math.PI;
-}
-function getScaleMax() {
-  if (scale_max_param !== null) return scale_max_param;
-  if (space_param === 'angle') return Math.PI;
-  if (space_param === 'velocity' || space_param === 'momentum') return 10;
-  if (space_param === 'mass') return 100;
-  if (space_param === 'length') return 200;
-  return Math.PI;
-}
 function setup() {
-  createCanvas(canvasSize, canvasSize)
-  var colorPlot = createImage(width, height)
-  colorPlot.loadPixels();
-
-  for (let i = 0; i < canvasSize + 1; i++) {
-    penduli.push([])
-  }
-  divergences = structuredClone(penduli)
-  for (let i = 0; i < divergences.length; i++) {
-    let e = divergences[i];
-    for (let j = 0; j < canvasSize + 1; j++) {
-      e.push(0)
-    }
-
-  }
-  a1divergences = structuredClone(divergences)
-  a2divergences = structuredClone(divergences)
-  const scaleMin = getScaleMin();
-  const scaleMax = getScaleMax();
-  for (let i = 0; i < canvasSize + 1; i++) {
-    for (let j = 0; j < canvasSize + 1; j++) {
-      let val1 = map(i, 0, canvasSize, scaleMin, scaleMax)
-      let val2 = map(j, 0, canvasSize, scaleMin, scaleMax)
-      let p = {
-        a1: space_param === 'angle' ? val1 : init_a1_param,
-        a2: space_param === 'angle' ? val2 : init_a2_param,
-        a1_v: (space_param === 'velocity' || space_param === 'momentum') ? val1 : a1_v_param,
-        a2_v: (space_param === 'velocity' || space_param === 'momentum') ? val2 : a2_v_param,
-        l1: space_param === 'length' ? val1 : l1_param,
-        l2: space_param === 'length' ? val2 : l2_param,
-        m1: space_param === 'mass' ? val1 : m1_param,
-        m2: space_param === 'mass' ? val2 : m2_param,
-        g: g_param,
-      }
-      penduli[i].push(p)
-    }
-  }
-
+  pixelDensity(1);
+  createCanvas(canvasSize, canvasSize);
+  localContext = drawingContext;
+  backend = initBackend(computeMethod);
 }
-
-
-
 
 function draw() {
-  //plot all the pendulums, so plot the difference between the pendulum and the pendulum right after it
-  background(0)
-  loadPixels();
-  //first fill the divergences array
-  //divergences[x][y] = (a1-a1'+a2-a2')/2 where a1',a2' are the angles of the pendulum right after
-  for (let x = 0; x < penduli.length - 1; x++) {
-    for (let y = 0; y < penduli[x].length - 1; y++) {
-      let p = penduli[x][y]
-      let pNext = penduli[x + 1][y] || penduli[x][y + 1] //edge case
-      let divergence = (Math.abs(p.a1 - pNext.a1) + Math.abs(p.a2 - pNext.a2)) / 2
-      divergences[x][y] = divergence
-    }
+  if (backend && typeof backend.draw === 'function') {
+    backend.draw(deltaTime);
+  }
+}
+
+function buildSimulatorOptions(overrides) {
+  const options = {
+    width: canvasSize,
+    height: canvasSize,
+    damp: damp,
+    useRK4: useRK4,
+    useDeltaTime: useDeltaTime,
+    timeStep: timeStep,
+    g: g_param,
+    l1: l1_param,
+    l2: l2_param,
+    m1: m1_param,
+    m2: m2_param,
+    a1v: a1_v_param,
+    a2v: a2_v_param,
+    space: space_param,
+    initA1: init_a1_param,
+    initA2: init_a2_param,
+    scaleMin: scale_min_param,
+    scaleMax: scale_max_param,
+    type: type
+  };
+  if (!overrides) return options;
+  return Object.assign(options, overrides);
+}
+
+function initBackend(method) {
+  if (typeof SimulationCore === 'undefined') {
+    console.warn('SimulationCore not found; simulation is disabled.');
+    return { draw: function () {} };
   }
 
-
-  for (let x = 0; x < penduli.length - 1; x++) {
-    for (let y = 0; y < penduli[x].length - 1; y++) {
-      let p = penduli[x][y]
-      let pNext = penduli[x + 1][y] || penduli[x][y + 1] //edge case
-      let divergence = Math.abs(p.a1 - pNext.a1)
-      a1divergences[x][y] = divergence
-    }
+  if (method === 'workers') {
+    const workerBackend = initWorkerBackend();
+    if (workerBackend) return workerBackend;
+    computeMethod = 'normal';
   }
 
-
-  for (let x = 0; x < penduli.length - 1; x++) {
-    for (let y = 0; y < penduli[x].length - 1; y++) {
-      let p = penduli[x][y]
-      let pNext = penduli[x][y + 1] || penduli[x + 1][y] //edge case
-      let divergence = Math.abs(p.a2 - pNext.a2)
-      a2divergences[x][y] = divergence
-    }
+  if (method === 'webgl') {
+    const webglBackend = initWebglBackend();
+    if (webglBackend) return webglBackend;
+    computeMethod = 'normal';
   }
-  //now plot the divergences
-  for (let x = 0; x < divergences.length; x++) {
-    for (let y = 0; y < divergences[x].length; y++) {
-      let divergence = divergences[x][y]
-      let bright = map(divergence, 0, 1, 0, 255)
-      let a1div = map(a1divergences[x][y], 0, 1, 0, 255)
-      let a2div = map(a2divergences[x][y], 0, 1, 255, 0)
-      let index = (x + y * width) * 4
-      let chv = getChannelValue(bright, a1div, a2div,penduli[x][y].a1,penduli[x][y].a2)
-      pixels[index] = chv[0]
-      pixels[index + 1] = chv[1]
-      pixels[index + 2] = chv[2]
-      pixels[index + 3] = chv[3]
 
+  return initLocalBackend();
+}
+
+function initLocalBackend() {
+  localSimulator = SimulationCore.createSimulator(buildSimulatorOptions());
+  localImageData = localContext.createImageData(canvasSize, canvasSize);
+  localPixels = localImageData.data;
+  workerStateRequest = null;
+
+  return {
+    draw: function (deltaTime) {
+      localSimulator.stepAndRender(deltaTime, localPixels);
+      localContext.putImageData(localImageData, 0, 0);
+      window.cfDeltaTime = deltaTime;
+      console.log(deltaTime);
     }
+  };
+}
+
+function initWebglBackend() {
+  webglCanvas = document.createElement('canvas');
+  webglCanvas.width = canvasSize;
+  webglCanvas.height = canvasSize;
+  const gl = webglCanvas.getContext('webgl', { premultipliedAlpha: false });
+  if (!gl) {
+    console.warn('WebGL not available; falling back to normal renderer.');
+    return null;
   }
-  updatePixels();
-  // now step all the pendulums
-  for (let x = 0; x < penduli.length; x++) {
-    for (let y = 0; y < penduli[x].length; y++) {
-      let p = penduli[x][y]
-      penduli[x][y] = stepDoublePendulum(p, getSteppingTime(deltaTime))
+
+  webglRenderer = createWebglRenderer(gl, canvasSize, canvasSize);
+  if (!webglRenderer) {
+    console.warn('WebGL renderer failed to initialize; falling back to normal renderer.');
+    return null;
+  }
+
+  localSimulator = SimulationCore.createSimulator(buildSimulatorOptions());
+  localPixels = new Uint8ClampedArray(canvasSize * canvasSize * 4);
+  workerStateRequest = null;
+
+  return {
+    draw: function (deltaTime) {
+      localSimulator.stepAndRender(deltaTime, localPixels);
+      webglRenderer.draw(localPixels);
+      localContext.drawImage(webglCanvas, 0, 0);
+      window.cfDeltaTime = deltaTime;
+      console.log(deltaTime);
     }
+  };
+}
+
+function initWorkerBackend() {
+  if (typeof Worker === 'undefined') {
+    console.warn('Web Workers not supported; falling back to normal renderer.');
+    return null;
   }
-  window.cfDeltaTime = deltaTime
-  
 
-  console.log(deltaTime)
-  
+  const maxWorkers = Math.min(navigator.hardwareConcurrency || 4, 8);
+  const workerCount = Math.max(1, Math.min(maxWorkers, canvasSize));
+  const workers = [];
+  const workerSlices = [];
+  let readyCount = 0;
+  let pendingSlices = 0;
+  let frameInFlight = false;
+  let lastDeltaTime = 0;
+  let fallbackTriggered = false;
+  workerStateRequest = function (x, y) {
+    const target = workerSlices.find(function (slice) {
+      return y >= slice.startRow && y < slice.endRow;
+    });
+    if (!target) return;
+    target.worker.postMessage({
+      type: 'state',
+      x: x,
+      y: y
+    });
+  };
 
+  let startRow = 0;
+  const baseRows = Math.floor(canvasSize / workerCount);
+  let remainder = canvasSize % workerCount;
+
+  for (let i = 0; i < workerCount; i++) {
+    const extra = remainder > 0 ? 1 : 0;
+    if (remainder > 0) remainder -= 1;
+    const endRow = startRow + baseRows + extra;
+    const worker = new Worker('compute-worker.js');
+
+    const slice = {
+      worker: worker,
+      startRow: startRow,
+      endRow: endRow,
+      height: endRow - startRow
+    };
+
+    worker.onmessage = function (event) {
+      const data = event.data || {};
+      if (data.type === 'ready') {
+        readyCount += 1;
+        return;
+      }
+      if (data.type === 'frame') {
+        const pixels = new Uint8ClampedArray(data.pixels);
+        const imageData = new ImageData(pixels, data.width, data.height);
+        localContext.putImageData(imageData, 0, data.startRow);
+        pendingSlices -= 1;
+        if (pendingSlices === 0) {
+          frameInFlight = false;
+          window.cfDeltaTime = lastDeltaTime;
+          console.log(lastDeltaTime);
+        }
+        return;
+      }
+      if (data.type === 'state' && data.state) {
+        openPendulumFromState(data.state);
+        return;
+      }
+    };
+
+    worker.onerror = function (error) {
+      console.error('Worker failed:', error);
+      if (!fallbackTriggered) {
+        fallbackTriggered = true;
+        workers.forEach(function (activeWorker) {
+          activeWorker.terminate();
+        });
+        computeMethod = 'normal';
+        workerStateRequest = null;
+        backend = initLocalBackend();
+      }
+    };
+
+    worker.postMessage({
+      type: 'init',
+      width: canvasSize,
+      height: canvasSize,
+      startRow: startRow,
+      endRow: endRow,
+      damp: damp,
+      useRK4: useRK4,
+      useDeltaTime: useDeltaTime,
+      timeStep: timeStep,
+      g: g_param,
+      l1: l1_param,
+      l2: l2_param,
+      m1: m1_param,
+      m2: m2_param,
+      a1v: a1_v_param,
+      a2v: a2_v_param,
+      space: space_param,
+      initA1: init_a1_param,
+      initA2: init_a2_param,
+      scaleMin: scale_min_param,
+      scaleMax: scale_max_param,
+      type: type
+    });
+
+    workers.push(worker);
+    workerSlices.push(slice);
+    startRow = endRow;
+  }
+
+  return {
+    draw: function (deltaTime) {
+      if (readyCount < workerCount) return;
+      if (frameInFlight) return;
+      frameInFlight = true;
+      pendingSlices = workerSlices.length;
+      lastDeltaTime = deltaTime;
+      workerSlices.forEach(function (slice) {
+        slice.worker.postMessage({
+          type: 'step',
+          deltaTime: deltaTime
+        });
+      });
+    }
+  };
+}
+
+function createWebglRenderer(gl, width, height) {
+  const vertexShaderSource = [
+    'attribute vec2 a_position;',
+    'attribute vec2 a_texCoord;',
+    'varying vec2 v_texCoord;',
+    'void main() {',
+    '  v_texCoord = a_texCoord;',
+    '  gl_Position = vec4(a_position, 0.0, 1.0);',
+    '}'
+  ].join('\n');
+
+  const fragmentShaderSource = [
+    'precision mediump float;',
+    'uniform sampler2D u_texture;',
+    'varying vec2 v_texCoord;',
+    'void main() {',
+    '  gl_FragColor = texture2D(u_texture, v_texCoord);',
+    '}'
+  ].join('\n');
+
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertexShader, vertexShaderSource);
+  gl.compileShader(vertexShader);
+  if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+    console.error('Vertex shader error:', gl.getShaderInfoLog(vertexShader));
+    gl.deleteShader(vertexShader);
+    return null;
+  }
+
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragmentShader, fragmentShaderSource);
+  gl.compileShader(fragmentShader);
+  if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+    console.error('Fragment shader error:', gl.getShaderInfoLog(fragmentShader));
+    gl.deleteShader(fragmentShader);
+    return null;
+  }
+
+  const program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error('Shader link error:', gl.getProgramInfoLog(program));
+    gl.deleteProgram(program);
+    return null;
+  }
+
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([
+      -1, -1, 0, 0,
+      1, -1, 1, 0,
+      -1, 1, 0, 1,
+      -1, 1, 0, 1,
+      1, -1, 1, 0,
+      1, 1, 1, 1
+    ]),
+    gl.STATIC_DRAW
+  );
+
+  const positionLocation = gl.getAttribLocation(program, 'a_position');
+  const texCoordLocation = gl.getAttribLocation(program, 'a_texCoord');
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 16, 0);
+  gl.enableVertexAttribArray(texCoordLocation);
+  gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 16, 8);
+
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+  const textureLocation = gl.getUniformLocation(program, 'u_texture');
+
+  return {
+    draw: function (pixels) {
+      gl.viewport(0, 0, width, height);
+      gl.useProgram(program);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      gl.uniform1i(textureLocation, 0);
+      gl.disable(gl.DEPTH_TEST);
+      gl.clearColor(0, 0, 0, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+  };
 }
 
 function keyPressed() {
@@ -399,32 +396,44 @@ function keyPressed() {
     save();
   }
 }
+
+function openPendulumFromState(state) {
+  const params = new URLSearchParams({
+    a1: state.a1,
+    a2: state.a2,
+    damp: damp,
+    timeStep: timeStep,
+    rk4: useRK4,
+    g: state.g,
+    l1: state.l1,
+    l2: state.l2,
+    m1: state.m1,
+    m2: state.m2,
+    a1_v: state.a1_v,
+    a2_v: state.a2_v
+  });
+  window.open(`pendulum.html?${params.toString()}`, '_blank');
+}
+
 function doubleClicked() {
   const x = Math.floor(mouseX);
   const y = Math.floor(mouseY);
-  if (x >= 0 && x < penduli.length && y >= 0 && y < penduli[0].length) {
-    const p = penduli[x][y];
-    const params = new URLSearchParams({
-      a1: p.a1,
-      a2: p.a2,
-      damp: damp,
-      timeStep: timeStep,
-      rk4: useRK4,
-      g: p.g,
-      l1: p.l1,
-      l2: p.l2,
-      m1: p.m1,
-      m2: p.m2,
-      a1_v: p.a1_v,
-      a2_v: p.a2_v
-    });
-    window.open(`pendulum.html?${params.toString()}`, '_blank');
+  if (x < 0 || y < 0 || x >= canvasSize || y >= canvasSize) return false;
+  if (computeMethod === 'workers') {
+    if (typeof workerStateRequest === 'function') {
+      workerStateRequest(x, y);
+    }
+    return false;
   }
+  if (!localSimulator) return false;
+  const state = localSimulator.getStateAt(x, y);
+  if (!state) return false;
+  openPendulumFromState(state);
   return false;
 }
-window.saveSketch = save
-function mousePressed(){
-  if (mouseButton === RIGHT){
+window.saveSketch = save;
+function mousePressed() {
+  if (mouseButton === RIGHT) {
     save();
   }
 }

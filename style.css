@@ -19,6 +19,15 @@ input{
   font-size: 1em;
 }
 
+select{
+  background-color: #252526;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  padding: 4px;
+  font-family: 'Roboto Mono','RobotoMono Nerd Font', 'Iosevka', 'Fira Code', monospace;
+  font-size: 1em;
+}
+
 button{
   background-color: #303036;
   color: #d4d4d4;
